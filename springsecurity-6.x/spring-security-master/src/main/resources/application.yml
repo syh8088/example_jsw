@@ -1,0 +1,10 @@
+spring:
+  r2dbc:
+    url: r2dbc:mysql://syh80883.cafe24.com/syh80883
+    username: 'syh80883'
+    password: 'abc123!@'
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+
+  thymeleaf:
+    cache: false
