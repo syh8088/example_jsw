@@ -29,6 +29,8 @@ public class FormAuthenticationProvider implements AuthenticationProvider {
         if (!passwordEncoder.matches(password, accountContext.getPassword())) {
             throw new BadCredentialsException("Invalid password");
         }
+
+        // Authentication 의 principal 속성에는 AccountContext 에 있는 AccountDto 를 설정한다.
         return new UsernamePasswordAuthenticationToken(accountContext.getAccountDto(), null, accountContext.getAuthorities());
     }
 
