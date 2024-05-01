@@ -1,6 +1,8 @@
 package io.security.springsecuritymaster.security.provider;
 
 import io.security.springsecuritymaster.domain.dto.AccountContext;
+import io.security.springsecuritymaster.security.details.FormWebAuthenticationDetails;
+import io.security.springsecuritymaster.security.exception.SecretException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,6 +30,11 @@ public class FormAuthenticationProvider implements AuthenticationProvider {
 
         if (!passwordEncoder.matches(password, accountContext.getPassword())) {
             throw new BadCredentialsException("Invalid password");
+        }
+
+        String secretKey = ((FormWebAuthenticationDetails) authentication.getDetails()).getSecretKey();
+        if (secretKey == null || !secretKey.equals("secret")) {
+            throw new SecretException("Invalid secret");
         }
 
         // Authentication 의 principal 속성에는 AccountContext 에 있는 AccountDto 를 설정한다.
