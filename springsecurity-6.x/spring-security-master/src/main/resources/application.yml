@@ -1,14 +1,17 @@
 spring:
-  r2dbc:
-    url: r2dbc:mysql://syh80883.cafe24.com/syh80883
-    username: 'syh80883'
-    password: 'abc123!@'
+#  r2dbc:
+#    url: r2dbc:mysql://syh80883.cafe24.com/syh80883
+#    username: 'syh80883'
+#    password: 'abc123!@'
+#  datasource:
+#    driver-class-name: com.mysql.jdbc.Driver
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-
+    url: jdbc:postgresql://localhost:5431/postgres
+    username: postgres
+    password: pass
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true

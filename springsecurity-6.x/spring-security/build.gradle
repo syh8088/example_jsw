@@ -1,20 +1,14 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.2.2'
+    id 'org.springframework.boot' version '3.2.5'
     id 'io.spring.dependency-management' version '1.1.4'
 }
 
-group = 'io.security'
+group = 'io.securiry'
 version = '0.0.1-SNAPSHOT'
 
 java {
     sourceCompatibility = '17'
-}
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
 }
 
 repositories {
@@ -28,16 +22,17 @@ dependencies {
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: '3.2.2'
     implementation 'org.modelmapper:modelmapper:3.1.0'
     compileOnly 'org.projectlombok:lombok'
-
-//    implementation group: 'mysql', name: 'mysql-connector-java', version: '5.1.21'
-//    implementation group: 'dev.miku', name: 'r2dbc-mysql', version: '0.8.2.RELEASE'
-    runtimeOnly 'org.postgresql:postgresql'
+    implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.5.0.Final'
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '5.1.21'
+//	runtimeOnly 'com.mysql:mysql-connector-j'
+    implementation group: 'dev.miku', name: 'r2dbc-mysql', version: '0.8.2.RELEASE'
 
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
 }
 
 tasks.named('test') {
