@@ -35,7 +35,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         HashSet<Role> roles = new HashSet<>();
         Role adminRole = createRoleIfNotFound("ROLE_ADMIN", "관리자");
         roles.add(adminRole);
-        createUserIfNotFound("admin", "admin@admin.com", "pass", roles);
+        createUserIfNotFound("admin", "admin@admin.com", "1234", roles);
     }
 
     public Role createRoleIfNotFound(String roleName, String roleDesc) {
@@ -45,6 +45,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
             role = Role.builder()
                     .roleName(roleName)
                     .roleDesc(roleDesc)
+                    .isExpression("N")
                     .build();
         }
         return roleRepository.save(role);
