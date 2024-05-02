@@ -40,5 +40,5 @@ public class RestApiController {
         return "logout";
     }
 
-    
+
 }
