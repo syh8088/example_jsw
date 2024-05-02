@@ -32,14 +32,16 @@ import org.springframework.security.web.authentication.WebAuthenticationDetails;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final UserDetailsService userDetailsService;
+//    private final UserDetailsService userDetailsService;
     private final AuthenticationProvider authenticationProvider;
+    private final AuthenticationProvider restAuthenticationProvider;
     private final AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails> authenticationDetailsSource;
     private final AuthenticationSuccessHandler successHandler;
     private final AuthenticationFailureHandler failureHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/images/**", "/js/**", "/favicon.*", "/*/icon-*").permitAll()
@@ -50,10 +52,11 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(
-                        form -> form.loginPage("/login").permitAll()
+                        form -> form.loginPage("/login")
                                 .authenticationDetailsSource(authenticationDetailsSource)
                                 .successHandler(successHandler)
                                 .failureHandler(failureHandler)
+                                .permitAll()
                 )
 //                .userDetailsService(userDetailsService)
                 .authenticationProvider(authenticationProvider)
@@ -67,13 +70,15 @@ public class SecurityConfig {
     public SecurityFilterChain restSecurityFilterChain(HttpSecurity http) throws Exception {
 
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
-        AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
+        authenticationManagerBuilder.authenticationProvider(restAuthenticationProvider);
+        AuthenticationManager authenticationManager = authenticationManagerBuilder.build(); // build() 는 최초 한번 만 호출해야 한다.
 
         http
                 .securityMatcher("/api/**")
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/images/**", "/js/**", "/favicon.*", "/*/icon-*").permitAll()
-                        .anyRequest().permitAll())
+                        .anyRequest().permitAll()
+                )
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(this.restAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
                 .authenticationManager(authenticationManager)
