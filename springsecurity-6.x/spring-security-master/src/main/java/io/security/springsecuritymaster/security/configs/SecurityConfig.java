@@ -1,5 +1,6 @@
 package io.security.springsecuritymaster.security.configs;
 
+import io.security.springsecuritymaster.security.entrypoint.RestAuthenticationEntryPoint;
 import io.security.springsecuritymaster.security.filters.RestAuthenticationFilter;
 import io.security.springsecuritymaster.security.handler.*;
 import io.security.springsecuritymaster.security.provider.FormAuthenticationProvider;
@@ -84,11 +85,19 @@ public class SecurityConfig {
                 .securityMatcher("/api/**")
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/images/**", "/js/**", "/favicon.*", "/*/icon-*").permitAll()
-                        .anyRequest().permitAll()
+                        .requestMatchers("/api","/api/login").permitAll()
+                        .requestMatchers("/api/user").hasAuthority("ROLE_USER")
+                        .requestMatchers("/api/manager").hasAuthority("ROLE_MANAGER")
+                        .requestMatchers("/api/admin").hasAuthority("ROLE_ADMIN")
+                        .anyRequest().authenticated()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(this.restAuthenticationFilter(http, authenticationManager), UsernamePasswordAuthenticationFilter.class)
                 .authenticationManager(authenticationManager)
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(new RestAuthenticationEntryPoint()) // 인증을 받지 않는 상태에서 거부 당했을때
+                        .accessDeniedHandler(new RestAccessDeniedHandler()) // 인증을 받는 상태에서 거부 당했을때
+                )
         ;
         return http.build();
     }
