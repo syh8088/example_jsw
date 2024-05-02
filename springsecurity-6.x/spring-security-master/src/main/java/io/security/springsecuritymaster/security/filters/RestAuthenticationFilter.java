@@ -32,6 +32,11 @@ public class RestAuthenticationFilter extends AbstractAuthenticationProcessingFi
         this.setSecurityContextRepository(this.getSecurityContextRepository(http));
     }
 
+    // RestApiDsl 전용
+    public RestAuthenticationFilter() {
+        super(new AntPathRequestMatcher("/api/login", "POST"));
+    }
+
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
 
@@ -49,7 +54,7 @@ public class RestAuthenticationFilter extends AbstractAuthenticationProcessingFi
         return getAuthenticationManager().authenticate(authenticationToken);
     }
 
-    private SecurityContextRepository getSecurityContextRepository(HttpSecurity http) {
+    public SecurityContextRepository getSecurityContextRepository(HttpSecurity http) {
         SecurityContextRepository securityContextRepository = http.getSharedObject(SecurityContextRepository.class);
         if (securityContextRepository == null) {
             securityContextRepository = new DelegatingSecurityContextRepository(
