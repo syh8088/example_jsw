@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+
+    url: jdbc:mysql://syh80883.cafe24.com/syh80883?characterEncoding=UTF-8&serverTimezone=UTC&verifyServerCertificate=false&useSSL=false
+    username: syh80883
+    password: abc123!@
+
+    sql-script-encoding: utf-8
+    tomcat:
+      max-wait: 10000
+
+  jpa:
+    hibernate:
+      use-new-id-generator-mappings: false
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        jdbc:
+          non_contextual_creation: true
+
+  thymeleaf:
+    cache: false
+
+
+  devtools:
+    livereload:
+      enabled: true
+
+    restart:
+      enabled: true
+
+  main:
+    allow-bean-definition-overriding: true

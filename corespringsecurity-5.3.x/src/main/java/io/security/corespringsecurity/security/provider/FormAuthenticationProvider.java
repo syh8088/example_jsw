@@ -1,0 +1,59 @@
+package io.security.corespringsecurity.security.provider;
+
+import io.security.corespringsecurity.security.common.FormWebAuthenticationDetails;
+import io.security.corespringsecurity.security.service.AccountContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
+
+public class FormAuthenticationProvider implements AuthenticationProvider {
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    // 검증(인증)을 위한 구현
+    @Override
+    @Transactional
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        String username = authentication.getName();
+        String password = (String) authentication.getCredentials();
+
+        AccountContext accountContext = (AccountContext) userDetailsService.loadUserByUsername(username);
+
+        if (!passwordEncoder.matches(password, accountContext.getAccount().getPassword())) {
+            throw new BadCredentialsException("BadCredentialsException");
+        }
+
+        FormWebAuthenticationDetails formWebAuthenticationDetails = (FormWebAuthenticationDetails) authentication.getDetails();
+        String secretKey = formWebAuthenticationDetails.getSecretKey();
+        if (secretKey == null || !"secret".equals(secretKey)) {
+            throw new InsufficientAuthenticationException("InsufficientAuthenticationException");
+        }
+
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(accountContext.getAccount(), null, accountContext.getAuthorities());
+        System.out.println("usernamePasswordAuthenticationToken = " + usernamePasswordAuthenticationToken);
+
+        return usernamePasswordAuthenticationToken;
+    }
+
+    // 파라미터로 전달되는 authentication 이 클래스 타입과
+    // FormAuthenticationProvider 이 클래스가 사용하고자 하는 토큰 타입과 일치할때
+    // 이 provider 인증 처리 할 수 있도록 조건 주도록 한다.
+    @Override
+    public boolean supports(Class<?> authentication) {
+        // UsernamePasswordAuthenticationToken 이 토큰이 현재
+        // 파라미터로 전달 된 authentication 타입과 일치 할때
+        // FormAuthenticationProvider 클래스가 인증 처리 할 수 있도록 한다.
+        return UsernamePasswordAuthenticationToken.class.isAssignableFrom(authentication);
+    }
+}
