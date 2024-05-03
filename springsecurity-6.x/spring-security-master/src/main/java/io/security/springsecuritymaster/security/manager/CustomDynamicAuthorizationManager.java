@@ -34,22 +34,16 @@ public class CustomDynamicAuthorizationManager implements AuthorizationManager<R
     private final HandlerMappingIntrospector handlerMappingIntrospector;
     private final ResourcesRepository resourcesRepository;
 
+    private DynamicAuthorizationService dynamicAuthorizationService;
+
     @PostConstruct
     public void mapping() {
 
 //        DynamicAuthorizationService dynamicAuthorizationService = new DynamicAuthorizationService(new MapBasedUrlRoleMapper());
-        DynamicAuthorizationService dynamicAuthorizationService = new DynamicAuthorizationService(new PersistentUrlRoleMapper(resourcesRepository));
-
-        mappings = dynamicAuthorizationService.getUrlRoleMappings()
-                .entrySet().stream()
-                .map(entry ->
-                        new RequestMatcherEntry<>(
-                            new MvcRequestMatcher(handlerMappingIntrospector, entry.getKey()),
-                            this.customAuthorizationManager(entry.getValue())
-                        )
-                )
-                .collect(Collectors.toList());
+        this.dynamicAuthorizationService = new DynamicAuthorizationService(new PersistentUrlRoleMapper(resourcesRepository));
+        this.setMapping();
     }
+
     @Override
     public AuthorizationDecision check(Supplier<Authentication> authentication, RequestAuthorizationContext request) {
 
@@ -85,4 +79,17 @@ public class CustomDynamicAuthorizationManager implements AuthorizationManager<R
         }
     }
 
+    public synchronized void reload() {
+        this.mappings.clear();
+        this.setMapping();
+    }
+
+    private void setMapping() {
+        this.mappings = this.dynamicAuthorizationService.getUrlRoleMappings()
+                .entrySet().stream()
+                .map(entry -> new RequestMatcherEntry<>(
+                        new MvcRequestMatcher(handlerMappingIntrospector, entry.getKey()),
+                        customAuthorizationManager(entry.getValue())))
+                .collect(Collectors.toList());
+    }
 }

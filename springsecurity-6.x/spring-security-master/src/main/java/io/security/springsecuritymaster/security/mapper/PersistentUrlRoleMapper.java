@@ -19,6 +19,8 @@ public class PersistentUrlRoleMapper implements UrlRoleMapper {
     @Override
     public Map<String, String> getUrlRoleMappings() {
 
+        this.urlRoleMappings.clear();
+
         List<Resources> resourcesList = resourcesRepository.findAllResources();
         resourcesList.forEach(re -> {
             re.getRoleSet().forEach(role -> {
