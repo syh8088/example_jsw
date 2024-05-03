@@ -32,10 +32,22 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     }
 
     private void setupData() {
-        HashSet<Role> roles = new HashSet<>();
-        Role adminRole = createRoleIfNotFound("ROLE_ADMIN", "관리자");
-        roles.add(adminRole);
-        createUserIfNotFound("admin", "admin@admin.com", "1234", roles);
+
+        HashSet<Role> adminRoles = new HashSet<>();
+        Role adminRole = createRoleIfNotFound("ROLE_ADMIN", "관리자 권한");
+        adminRoles.add(adminRole);
+
+        HashSet<Role> managerRoles = new HashSet<>();
+        Role managerRole = createRoleIfNotFound("ROLE_MANAGER", "사용자 권한");
+        managerRoles.add(managerRole);
+
+        HashSet<Role> userRoles = new HashSet<>();
+        Role userRole = createRoleIfNotFound("ROLE_USER", "사용자 권한");
+        userRoles.add(userRole);
+
+        createUserIfNotFound("admin", "admin@admin.com", "1234", adminRoles);
+        createUserIfNotFound("manager", "manager@manager.com", "1234", managerRoles);
+        createUserIfNotFound("user", "user@user.com", "1234", userRoles);
     }
 
     public Role createRoleIfNotFound(String roleName, String roleDesc) {
@@ -52,6 +64,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     }
 
     public void createUserIfNotFound(final String userName, final String email, final String password, Set<Role> roleSet) {
+
         Account account = userRepository.findByUsername(userName);
 
         if (account == null) {
@@ -61,6 +74,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
                     .userRoles(roleSet)
                     .build();
         }
+
         userRepository.save(account);
     }
+
 }
